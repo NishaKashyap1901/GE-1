@@ -1,6 +1,8 @@
 package com.example.grappler.Controller;
 
+import com.example.grappler.Entity.Tickets;
 import com.example.grappler.Entity.Worklogs;
+import com.example.grappler.Service.TicketService;
 import com.example.grappler.Service.WorklogsService;
 import com.example.grappler.dto.WorklogsDTO;
 import org.slf4j.Logger;
@@ -19,6 +21,9 @@ import java.util.stream.Collectors;
  public class WorklogController {
     @Autowired
     private WorklogsService worklogsService;
+
+    @Autowired
+    TicketService ticketService;
     Logger logger= LoggerFactory.getLogger(com.example.grappler.Entity.Tickets.class);
 
     /**
@@ -53,6 +58,20 @@ import java.util.stream.Collectors;
         } catch (Exception e) {
             logger.error("Failed to retrieve all worklogs.", e);
             throw new RuntimeException("Failed to retrieve worklogs.", e);
+        }
+    }
+
+    @GetMapping("/by-ticket/{ticketId}")
+    public ResponseEntity<List<Worklogs>> getWorklogsByTicketIds(@PathVariable Long ticketId) {
+        if (ticketId == null || ticketId <= 0) {
+            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
+        }
+
+        try {
+            List<Worklogs> worklogs = worklogsService.getWorklogsByTicketId(ticketId);
+            return new ResponseEntity<>(worklogs, HttpStatus.OK);
+        } catch (Exception ex) {
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
@@ -150,5 +169,45 @@ import java.util.stream.Collectors;
     public ResponseEntity<Void> deleteWorklog(@PathVariable Long logId) {
         worklogsService.deleteWorklog(logId);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+
+
+
+    @PostMapping("/{ticketId}")
+    public ResponseEntity<?> createWorklog(@PathVariable Long ticketId, @RequestBody Worklogs worklog) {
+        try {
+            // Perform validation if needed
+            if (worklog.getDate() == null || worklog.getDuration() <= 0) {
+                return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Invalid worklog data.");
+            }
+
+            // You can implement similar logic for fetching related entities (e.g., projects, users)
+
+            // Find the corresponding ticket
+            Tickets ticket = ticketService.getTicketById(ticketId);
+            if (ticket == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ticket not found.");
+            }
+
+            // Create a new Worklog instance
+            Worklogs newWorklog = new Worklogs();
+            newWorklog.setLog_id(worklog.getLog_id());
+            newWorklog.setDate(worklog.getDate());
+            newWorklog.setDuration(worklog.getDuration());
+            newWorklog.setEnd_time(worklog.getEnd_time());
+            newWorklog.setStart_time(worklog.getStart_time());
+            newWorklog.setTickets(ticket);  // Set the ticket
+
+            // Save the new worklog
+            Worklogs createdWorklog = worklogsService.createWorklog(newWorklog);
+
+            logger.info("Created a new worklog with ID: {}", createdWorklog.getLog_id());
+
+            return new ResponseEntity<>(createdWorklog, HttpStatus.CREATED);
+        } catch (Exception e) {
+            logger.error("An error occurred while creating a worklog: " + e.getMessage(), e);
+            return new ResponseEntity<>("An error occurred: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

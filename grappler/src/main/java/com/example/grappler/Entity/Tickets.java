@@ -20,13 +20,12 @@ public class Tickets {
     private List<Users> users;
 
     @ManyToOne
+    @JoinColumn(name = "assigned_id")
+    @JsonIgnore
     private AssignmentHistory assignmentHistory;
 
     @OneToMany(mappedBy = "tickets" ,cascade=CascadeType.ALL)
     private List<Worklogs> worklogs;
-
-    @OneToMany(mappedBy = "tickets" ,cascade=CascadeType.ALL)
-    private List<Ticket_assign>  ticket_assign ;
 
     @ManyToOne
     @JoinColumn(name = "projectId")
@@ -108,14 +107,6 @@ public class Tickets {
 
     public void setWorklogs(List<Worklogs> worklogs) {
         this.worklogs = worklogs;
-    }
-
-    public List<Ticket_assign> getTicket_assign() {
-        return ticket_assign;
-    }
-
-    public void setTicket_assign(List<Ticket_assign> ticket_assign) {
-        this.ticket_assign = ticket_assign;
     }
 
     public List<Planed> getPlaned() {

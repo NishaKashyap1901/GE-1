@@ -17,6 +17,15 @@ public class TicketService {
     @Autowired
     private ProjectRepository projectRepository;
 
+    @Autowired
+    public TicketService(TicketRepository ticketRepository) {
+        this.ticketsRepository = ticketRepository;
+    }
+    public List<Tickets> getTicketsByUserId(Long userId) {
+        return ticketsRepository.findTicketsByUserId(userId);
+    }
+
+
     public List<Tickets> getAllTickets() {
         return ticketsRepository.findAll();
     }

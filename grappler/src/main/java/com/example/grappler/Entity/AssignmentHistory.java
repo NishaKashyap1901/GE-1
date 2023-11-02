@@ -2,8 +2,10 @@ package com.example.grappler.Entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
+import lombok.Data;
 
 import java.util.List;
+@Data
 @Entity
 public class AssignmentHistory {
     @OneToMany(mappedBy = "assignmentHistory" ,cascade=CascadeType.ALL)
@@ -20,6 +22,9 @@ public class AssignmentHistory {
     String previous_assignee;
 
     String new_assignee;
+
+    public AssignmentHistory() {
+    }
 
     public AssignmentHistory(Long assigned_id, String previous_assignee, String new_assignee) {
         this.assigned_id = assigned_id;

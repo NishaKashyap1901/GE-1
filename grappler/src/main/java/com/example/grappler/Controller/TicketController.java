@@ -82,6 +82,23 @@ class TicketController {
         }
     }
 
+    @GetMapping("/user/{id}")
+    public ResponseEntity<List<Tickets>> getTicketsByUserId(@PathVariable Long id) {
+        try {
+            List<Tickets> tickets = ticketService.getTicketsByUserId(id);
+            if (tickets.isEmpty()) {
+                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+            } else {
+                logger.info("Retrieved tickets for User ID: {}", id);
+                return new ResponseEntity<>(tickets, HttpStatus.OK);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to retrieve tickets for User ID: {}", id, e);
+            throw new RuntimeException("Failed to retrieve the tickets.", e);
+        }
+    }
+
+
     @GetMapping("/projects/{projectId}/tickets")
     public ResponseEntity<List<Tickets>> getTicketsByProjectId(@PathVariable Long projectId) {
         try {
@@ -118,6 +135,8 @@ class TicketController {
             ticket1.setTitle(ticket.getTitle());
             ticket1.setDesciption(ticket.getDesciption());
             ticket1.setEstimatedTime(ticket.getEstimatedTime());
+            ticket1.setStart_time(ticket.getStart_time());
+            ticket1.setEnd_time(ticket.getEnd_time());
             ticket1.setPriority(ticket.getPriority());
             ticket1.setUserIds(ticket.getUserIds());
             ticket1.setUsers(users);

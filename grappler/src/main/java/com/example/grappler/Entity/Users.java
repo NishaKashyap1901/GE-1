@@ -18,9 +18,11 @@ public class Users {
     Role role;
 
     @OneToMany(mappedBy = "users" ,cascade=CascadeType.ALL)
+    @JsonIgnore
     private List<Ticket_assign> ticket_assign;
 
     @OneToMany(mappedBy = "users" ,cascade=CascadeType.ALL)
+    @JsonIgnore
     private List<Worklogs> worklogs;
 
     @ManyToMany(mappedBy = "users")

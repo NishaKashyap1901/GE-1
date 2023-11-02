@@ -6,6 +6,7 @@ import com.example.grappler.Exception.ResourceNotFoundException;
 import com.example.grappler.Repository.ProjectRepository;
 import com.example.grappler.Service.ProjectService;
 import com.example.grappler.dto.ProjectsDTO;
+import com.example.grappler.dto.TicketsDTO;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -28,10 +29,6 @@ public class ProjectController {
     @Autowired
     private ProjectService projectService;
 
-    private ProjectsDTO mapProjectToDTO(Projects project) {
-        ModelMapper modelMapper = new ModelMapper();
-        return modelMapper.map(project, ProjectsDTO.class);
-    }
     @GetMapping("/")
     public ResponseEntity<?> getAllProjects() {
         try {
@@ -42,7 +39,19 @@ public class ProjectController {
             } else {
                 // Convert Projects entities to ProjectsDTO
                 List<ProjectsDTO> projectDTOs = projects.stream()
-                        .map(this::mapProjectToDTO)
+                        .map(project -> {
+                            ModelMapper modelMapper = new ModelMapper();
+
+                            // Handle the conversion of PersistentBag to List
+                            List<TicketsDTO> tickets = project.getTickets()
+                                    .stream()
+                                    .map(ticket -> modelMapper.map(ticket, TicketsDTO.class))
+                                    .collect(Collectors.toList());
+
+                            ProjectsDTO projectDTO = modelMapper.map(project, ProjectsDTO.class);
+                            projectDTO.setTickets(tickets);
+                            return projectDTO;
+                        })
                         .collect(Collectors.toList());
                 return ResponseEntity.ok(projectDTOs);
             }
@@ -52,6 +61,8 @@ public class ProjectController {
         }
     }
 
+
+    // Other contro
 
     @GetMapping("/{projectId}/ticket")
     public ResponseEntity<Projects> getTicketByProjectById(@PathVariable Long projectId) {

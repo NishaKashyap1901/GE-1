@@ -1,9 +1,6 @@
 package com.example.grappler.dto;
 
-import com.example.grappler.Entity.Tickets;
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import lombok.Data;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -14,6 +11,6 @@ public class ProjectsDTO {
     private String description;
     private LocalDateTime start_date;
     private LocalDateTime end_date;
-    private List<Tickets> tickets;
+    private List<TicketsDTO> tickets;
 
 }

@@ -27,7 +27,7 @@ public class Worklogs {
     private List<AssignmentHistory> assignmentHistory ;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)@Column(name ="log_id",nullable=false )Long log_id;
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)@Column(name ="log_id",nullable=false ,columnDefinition = "SERIAL")Long log_id;
 
     private LocalDateTime date;
     private LocalDateTime start_time;//min
